@@ -1,3 +1,4 @@
+using Sekibura.ClockInterview.System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,11 +23,13 @@ namespace StarGames.Digger.System
         }
 
         private void RegisterSystems()
-        {          
+        {
+            SystemManager.Register<TimeController>();
         }
 
         private void GetSystems()
         {
+            SystemManager.Get<TimeController>();
         }
 
         private void SetApplicationSettings()
@@ -44,7 +47,9 @@ namespace StarGames.Digger.System
 
         private void OnDestroy()
         {
+            SystemManager.Get<TimeController>().Dispose();
             SystemManager.Dispose();
+
             _isLoaded = false;
         }
     }

@@ -8,6 +8,7 @@ namespace StarGames.Digger.System
     public interface IInitializable
     {
         void Initialize();
+        void Dispose();
     }
 
     /// <summary>
