@@ -53,7 +53,7 @@ namespace Sekibura.ClockInterview.System
             Debug.Log("Текущее время: " + _syncedTime.ToString("HH:mm:ss"));
             TimeUpdatedAction?.Invoke(_syncedTime);
         }
-        private void SyncTime()
+        public void SyncTime()
         {
             try
             {
