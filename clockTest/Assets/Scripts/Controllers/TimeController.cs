@@ -26,6 +26,8 @@ namespace Sekibura.ClockInterview.System
         private Timer _syncTimer;
 
         public Action<DateTime> TimeUpdatedAction;
+        public Action<DateTime> TimeNewMinuteUpdateAction;
+        public Action<DateTime> TimeNewHourUpdateAction;
 
         public void Initialize()
         {
@@ -47,11 +49,18 @@ namespace Sekibura.ClockInterview.System
             _syncTimer.Elapsed += (s,e) => SyncTime();
             _syncTimer.Start();
         }
+
         private void UpdateTime(object sender, ElapsedEventArgs e)
         {
             _syncedTime = _syncedTime.AddSeconds(1);
             Debug.Log("Текущее время: " + _syncedTime.ToString("HH:mm:ss"));
             TimeUpdatedAction?.Invoke(_syncedTime);
+
+            if(_syncedTime.Second == 0)
+                TimeNewMinuteUpdateAction?.Invoke(_syncedTime);
+
+            if(_syncedTime.Minute == 0)
+                TimeNewHourUpdateAction?.Invoke(_syncedTime);
         }
         public void SyncTime()
         {
@@ -68,7 +77,12 @@ namespace Sekibura.ClockInterview.System
             TimeUpdatedAction?.Invoke(_syncedTime);
         }
 
-        public static DateTime[] GetNetworkTimeFromServers(string[] ntpServers)
+        public DateTime GetDateTime()
+        {
+            return _syncedTime;
+        }
+
+        private DateTime[] GetNetworkTimeFromServers(string[] ntpServers)
         {
             DateTime[] times = new DateTime[ntpServers.Length];
 
@@ -88,7 +102,7 @@ namespace Sekibura.ClockInterview.System
             return times;
         }
 
-        public static DateTime GetNetworkTime(string ntpServer)
+        private DateTime GetNetworkTime(string ntpServer)
         {
             var epoch = new DateTime(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var ntpData = new byte[48];
@@ -111,7 +125,7 @@ namespace Sekibura.ClockInterview.System
             }
         }
 
-        public static DateTime GetAverageNetworkTime(string[] ntpServers)
+        private DateTime GetAverageNetworkTime(string[] ntpServers)
         {
             DateTime[] times = new DateTime[ntpServers.Length];
 

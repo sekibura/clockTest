@@ -25,11 +25,13 @@ namespace StarGames.Digger.System
         private void RegisterSystems()
         {
             SystemManager.Register<TimeController>();
+            SystemManager.Register<AlarmClockController>();
         }
 
         private void GetSystems()
         {
             SystemManager.Get<TimeController>();
+            SystemManager.Get<AlarmClockController>();
         }
 
         private void SetApplicationSettings()
