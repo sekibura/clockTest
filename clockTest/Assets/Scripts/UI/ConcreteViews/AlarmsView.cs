@@ -18,6 +18,7 @@ namespace Sekibura.ClockInterview.UI
         [SerializeField]
         private TMP_InputField _nameInput;
 
+        
         [Header("Digital watch")]
         [SerializeField]
         private GameObject _digitanWatchPnl;
@@ -32,7 +33,11 @@ namespace Sekibura.ClockInterview.UI
         [SerializeField]
         private GameObject _analogWatchPnl;
         [SerializeField]
+        private GameObject _analogAMPMBtn;
+        [SerializeField]
         private Sprite _digitalSprite;
+        [SerializeField]
+        private UI_AnalogAlarmInputController _analogInput;
 
 
         private AlarmClockController _alarmClockController;
@@ -58,6 +63,12 @@ namespace Sekibura.ClockInterview.UI
             _nameInput.text = "";
             _hoursDigitalInput.text = "00";
             _minutesDigitalInput.text = "00";
+
+
+            _digitanWatchPnl.SetActive(true);
+            _analogWatchPnl.SetActive(false);
+            _analogAMPMBtn.SetActive(false);
+            _isDigital = true;
             _buttonImage.sprite = _analogSprite;
         }
 
@@ -68,12 +79,16 @@ namespace Sekibura.ClockInterview.UI
                 _digitanWatchPnl.SetActive(false);
                 _analogWatchPnl.SetActive(true);
                 _isDigital = false;
+                _analogAMPMBtn.SetActive(true);
+                _buttonImage.sprite = _digitalSprite;
             }
             else
             {
                 _digitanWatchPnl.SetActive(true);
                 _analogWatchPnl.SetActive(false);
+                _analogAMPMBtn.SetActive(false);
                 _isDigital = true;
+                _buttonImage.sprite = _analogSprite;
             }
         }
 
@@ -81,14 +96,17 @@ namespace Sekibura.ClockInterview.UI
         {
             if (_isDigital)
             {
-                string timeString = $"{_hoursDigitalInput.text}:{_minutesDigitalInput.text}" ; // строка с часами и минутами
+                string timeString = $"{_hoursDigitalInput.text}:{_minutesDigitalInput.text}" ;
                 DateTime time = DateTime.ParseExact(timeString, "HH:mm", null);
                 _alarmClockController.AddAlarm(time, _nameInput.text);
 
             }
             else
             {
-
+                string timeString = $"{_analogInput.Hours}:{_analogInput.Minutes}"; 
+                Debug.Log(timeString);
+                DateTime time = DateTime.ParseExact(timeString, "HH:mm", null);
+                _alarmClockController.AddAlarm(time, _nameInput.text);
             }
             ViewManager.Show<MainClockView>();
         }

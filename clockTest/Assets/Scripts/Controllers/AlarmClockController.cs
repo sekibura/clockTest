@@ -1,3 +1,4 @@
+using PimDeWitte.UnityMainThreadDispatcher;
 using Sekibura.ClockInterview.UI;
 using StarGames.Digger.System;
 using System;
@@ -11,6 +12,8 @@ namespace Sekibura.ClockInterview.System
     {
         private List<AlarmClock> _alarms = new List<AlarmClock>();
         private TimeController _timeController;
+        public Action<AlarmClock> AlarmAddedAction;
+        public Action AlarmClearedAction;
         public void Initialize()
         {
             SystemManager.Get(out _timeController);
@@ -19,23 +22,40 @@ namespace Sekibura.ClockInterview.System
 
         public void AddAlarm(DateTime alarmTime, string name)
         {
-            _alarms.Clear();
-            _alarms.Add(new AlarmClock(alarmTime, name));
-            Debug.Log($"Добавлен будильник на {alarmTime.Hour}:{alarmTime.Minute}");
+            DeleteAlarms();
+            var alarm = new AlarmClock(alarmTime, name);
+            _alarms.Add(alarm);
+            Debug.Log($"Добавлен будильник на {alarmTime.Hour}:{alarmTime.Minute} - {alarmTime.ToString()}");
+            AlarmAddedAction?.Invoke(alarm);
         }
 
         private void CheckAlarms(DateTime alarmDateTime)
         {
+            Debug.Log("Проверка будильников");
             foreach (AlarmClock alarm in _alarms)
             {
-                if(alarm.Time.Hour == alarmDateTime.Hour && alarm.Time.Minute == alarmDateTime.Minute)
+                if((alarm.Time.Hour == alarmDateTime.Hour) && (alarm.Time.Minute == alarmDateTime.Minute))
                 {
-                    //ViewManager.Show<AlarmSirenView>(alarm);
-                    //_alarms.Clear();
-                    Debug.Log($"СРАБОТАЛ БУДИЛЬНИК! {alarm.Time.Hour}:{alarm.Time.Minute}");
+                    Debug.Log($"СРАБОТАЛ бу ДИЛЬНИК! {alarm.Time.Hour}:{alarm.Time.Minute}");
+                    UnityMainThreadDispatcher.Instance().Enqueue(() => ViewManager.Show<AlarmSirenView>(alarm, hideLast:false));
+
+                    DeleteAlarms();
+                    
                     break;
                 }
             }
+        }
+
+
+        public List<AlarmClock> GetAlarms()
+        {
+            return _alarms;
+        }
+
+        public void DeleteAlarms()
+        {
+            _alarms.Clear();
+            AlarmClearedAction?.Invoke();
         }
 
         public void Dispose(){}
